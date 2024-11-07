@@ -4,6 +4,7 @@ import static android.view.View.INVISIBLE;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
         wyswietlPytanie(0);
         buttonDalej = findViewById(R.id.buttonDalej);
+        buttonDalej.setVisibility(INVISIBLE);
         buttonDalej.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -49,9 +51,19 @@ public class MainActivity extends AppCompatActivity {
                         aktualne++;
                         if(aktualne == pytania.size()){
                             buttonDalej.setVisibility(INVISIBLE);
+                            radioGroup.setVisibility(INVISIBLE);
+                            textView.setText("Otrzymano");
+                            buttonSprawdz.setVisibility(INVISIBLE);
                             aktualne--;
                         }
-                        wyswietlPytanie(aktualne);
+                        else {
+                            wyswietlPytanie(aktualne);
+                            buttonDalej.setVisibility(INVISIBLE);
+                            for (int j = 0; j < radioButtons.length; j++) {
+                                radioButtons[j].setTextColor(Color.parseColor("#000000"));
+                                buttonSprawdz.setVisibility(View.VISIBLE);
+                            }
+                        }
                     }
                 }
         );
@@ -66,14 +78,21 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i <radioButtons.length; i++) {
                            if( radioButtons[i].getId() == idZaznaczone){
                                 pytania.get(aktualne).sprawdzOdpowiedz(i);
+                                radioButtons[i].setChecked(false);
+
+                               buttonDalej.setVisibility(View.VISIBLE);
+
                                 if(pytania.get(aktualne).isCzyUdzielonoPoprawnejOdpowiedzi()){
                                     Toast.makeText(MainActivity.this, "dobraOdpowiedz", Toast.LENGTH_SHORT).show();
+                                    radioButtons[i].setTextColor(Color.parseColor("#11FF00"));
+
                                 }
                                 else{
                                     Toast.makeText(MainActivity.this, "ZlaOdpowiedz", Toast.LENGTH_SHORT).show();
+                                    radioButtons[i].setTextColor(Color.parseColor("#FF0000"));
                                 }
+                               buttonSprawdz.setVisibility(INVISIBLE);
                             }
-
                         }
                     }
                 }
@@ -88,7 +107,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sprawdz(){}
+    private int podliczPunkty(){
+        int sumaPunktow = 0;
+        for (Pytanie pytanie:pytania) {
+            if (pytanie.isCzyUdzielonoPoprawnejOdpowiedzi()){
+                sumaPunktow++;
+            }
+        }
+        return sumaPunktow;
+    }
 
 
 
